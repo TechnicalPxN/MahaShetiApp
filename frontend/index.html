@@ -183,7 +183,6 @@
             data.forEach(item => {
                 html += '<tr>';
                 headers.forEach(header => {
-                    // सुनिश्चित करा की null किंवा undefined व्हॅल्यूज ' ' म्हणून प्रदर्शित होतील
                     const value = item[header] === null || item[header] === undefined ? '' : item[header];
                     html += `<td>${value}</td>`;
                 });
