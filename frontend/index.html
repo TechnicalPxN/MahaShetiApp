@@ -226,9 +226,10 @@
 
             } catch (error) {
                 dataDisplay.innerHTML = `<div class="error">
-                                            <p><strong>डेटा फेच करताना त्रुटी:</strong> ${error.message}</p>
-                                            <p>कृपया बॅकएंड सर्व्हर चालू असल्याची (http://localhost:3000) खात्री करा.</p>
-                                        </div>`;
+                    <p><strong>डेटा फेच करताना त्रुटी:</strong> ${error.message}</p>
+                    <p>सूचना: कृपया बॅकएंड जागे होण्याची (Wake up) प्रतीक्षा करा. <br> 
+                    <a href="${API_BASE_URL}/api/crops" target="_blank" style="color: #721c24; font-weight: bold;">येथे क्लिक करून स्टेटस तपासा</a></p>
+                </div>`;
                 console.error('Fetch Error:', error);
             }
         }
