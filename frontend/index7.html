@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="MahaSheti Smart App - Exclusive for Parbhani Farmers">
+    <meta name="author" content="TechnicalPxN">
+    <title>MahaSheti Smart Pro - GitHub Edition</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* ========================================
+           CSS STYLING - FULLY EXPANDED (700+ LINES)
+           ========================================
+        */
+        :root {
+            --primary-green: #1b5e20;
+            --accent-green: #4caf50;
+            --dark-bg: #121212;
+            --light-bg: #f8faf8;
+            --white: #ffffff;
+            --text-main: #263238;
+            --text-sub: #546e7a;
+            --danger: #d32f2f;
+            --wa-color: #25D366;
+            --bank-blue: #1565c0;
+            --tractor-gold: #ffa000;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 100px;
+            transition: all 0.3s ease-in-out;
+            user-select: none;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 10px; }
+
+        /* --- Header & Navigation --- */
+        .app-header {
+            background: var(--white);
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+        }
+
+        body.dark-mode .app-header {
+            background: #1e1e1e;
+            border-bottom: 1px solid #333;
+        }
+
+        .app-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--primary-green);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .app-title span { color: var(--accent-green); }
+
+        /* --- Back Button Style --- */
+        #back-btn {
+            display: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--primary-green);
+        }
+
+        /* --- Side Drawer Menu --- */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 310px;
+            height: 100%;
+            background: var(--white);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.25);
+            z-index: 2100;
+            transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            padding: 30px 20px;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .side-menu { background: #1a1a1a; }
+
+        .side-menu.open { right: 0; }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 2050;
+        }
+
+        /* --- Professional Developer Card --- */
+        .pxn-dev-card {
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--white);
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(27, 94, 32, 0.3);
+        }
+
+        .pxn-dev-card img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.3);
+            margin-bottom: 15px;
+        }
+
+        /* --- Dashboard Grid System --- */
+        .content-wrapper {
+            width: 92%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .hero-banner {
+            background: #e8f5e9;
+            padding: 18px;
+            border-radius: 18px;
+            border-left: 6px solid var(--primary-green);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .grid-card {
+            background: var(--white);
+            padding: 28px 15px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: transform 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+
+        body.dark-mode .grid-card { background: #252525; border: none; }
+
+        .grid-card:active { transform: translateY(4px) scale(0.96); }
+
+        .grid-card i {
+            font-size: 38px;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--primary-green);
+        }
+
+        .grid-card label {
+            font-weight: 700;
+            font-size: 15px;
+            display: block;
+        }
+
+        /* --- Sections Style (7-12, Market, etc.) --- */
+        .section-box {
+            display: none;
+            background: var(--white);
+            padding: 25px;
+            border-radius: 28px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            animation: slideIn 0.5s ease;
+        }
+
+        body.dark-mode .section-box { background: #1e1e1e; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sec-title {
+            color: var(--primary-green);
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 5px solid var(--primary-green);
+        }
+
+        /* --- Parbhani Market Specials --- */
+        .market-header-special {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px dashed #ffc107;
+        }
+
+        .crop-row-highlight {
+            background: #f1f8e9 !important;
+            font-weight: 800 !important;
+            color: var(--primary-green);
+        }
+
+        /* --- Inputs & Buttons --- */
+        .modern-input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            border: 2px solid #eee;
+            background: #fdfdfd;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .modern-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(27, 94, 32, 0.2);
+            transition: 0.3s;
+        }
+
+        .modern-btn:hover { background: var(--accent-green); }
+
+        /* --- Table View --- */
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .report-table th { background: #f5f5f5; padding: 12px; text-align: left; font-size: 13px; }
+        .report-table td { padding: 15px 12px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+
+        /* --- Bottom Nav Bar --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        body.dark-mode .bottom-nav-bar { background: #1e1e1e; border-top: 1px solid #333; }
+
+        .nav-icon-link {
+            text-align: center;
+            color: #b0bec5;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .nav-icon-link.active { color: var(--primary-green); }
+        .nav-icon-link i { font-size: 26px; display: block; margin-bottom: 4px; }
+
+
+        .announcement-container {
+            background: #e8f5e9;
+            overflow: hidden;
+            white-space: nowrap;
+            border-radius: 15px;
+            border-left: 6px solid var(--primary-green);
+            margin-bottom: 25px;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 25s linear infinite;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary-green);
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .news-label {
+            background: var(--primary-green);
+            color: white;
+            padding: 5px 12px;
+            font-weight: bold;
+            border-radius: 0 20px 20px 0;
+            z-index: 10;
+            font-size: 12px;
+        }
+
+        /* --- Welcome Popup Style --- */
+        .welcome-popup {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            z-index: 3000;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            display: none;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { opacity:0; scale: 0.5; } to { opacity:1; scale: 1; } }
+    </style>
+</head>
+<body onload="showWelcome()">
+
+<div class="overlay" id="mainOverlay" onclick="toggleMenu()"></div>
+
+<div id="welcomeBox" class="welcome-popup">
+    <i class="fa-solid fa-circle-check" style="font-size: 50px; color: var(--accent-green); margin-bottom: 15px;"></i>
+    <h2 style="color: var(--primary-green); margin: 0;">नमस्ते!</h2>
+    <p style="font-weight: 600; color: #555;">Welcome to Bhagwat Nagre Web</p>
+    <p style="font-size: 13px; color: #888; margin-top: 10px;">लोड होत आहे, कृपया प्रतीक्षा करा...</p>
+</div>
+
+<header class="app-header">
+    <div class="app-title">
+        <i class="fa-solid fa-arrow-left" id="back-btn" onclick="goHome()"></i>
+        महाशेती <span>PRO</span>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <i class="fa-solid fa-moon" style="font-size: 22px; cursor: pointer;" onclick="toggleDarkMode()"></i>
+        <i class="fa-solid fa-bars-staggered" style="font-size: 24px; cursor: pointer; color: var(--primary-green);" onclick="toggleMenu()"></i>
+    </div>
+</header>
+
+<nav class="side-menu" id="sideNav">
+    <div style="text-align: left; margin-bottom: 20px;">
+        <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 25px; color: var(--danger);" onclick="toggleMenu()"></i>
+    </div>
+    
+    <div class="pxn-dev-card">
+        <img src="https://img.icons8.com/bubbles/100/000000/user.png" alt="TechnicalPxN">
+        <h3 style="margin: 0;">Bhagwat Sheshrao Nagare</h3>
+        <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Agriculture Tech Developer</p>
+    </div>
+
+    <div style="padding: 10px;">
+        <p style="font-weight: bold; color: var(--text-sub);">मुख्य विभाग</p>
+        <button class="modern-btn" onclick="openSection('diary-sec'); toggleMenu()" style="margin-bottom: 12px; background: var(--bank-blue);">📔 हिशोब डायरी</button>
+        <button class="modern-btn" onclick="openSection('loan-sec'); toggleMenu()" style="margin-bottom: 12px; background: #555;">🏦 कर्ज हिशोब</button>
+        <button class="modern-btn" onclick="openSection('market-sec'); toggleMenu()">📈 बाजार भाव</button>
+    </div>
+
+    <div style="position: absolute; bottom: 30px; width: 80%; text-align: center; font-size: 11px; color: #999;">
+        Build: 2025.12.18.Stable <br> GitHub Open Source Project
+    </div>
+</nav>
+
+<main class="content-wrapper">
+
+    <div id="home-dashboard">
+        <div class="announcement-container">
+            <div class="news-label">महत्त्वाचे:</div>
+            <div class="ticker-text">
+                📢 नमो शेतकरी योजनेचा नवीन हप्ता जाहीर झाला आहे, अधिक माहितीसाठी 'योजना' विभाग पहा... &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; 
+                📍 परभणी मार्केटमध्ये कापूस दरात ५०० रुपयांची वाढ... &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; 
+                ⛈️ पुढील ४८ तासांत जिल्ह्यामध्ये हलक्या पावसाची शक्यता, पिकांची काळजी घ्या... &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; 
+                🚜 ट्रॅक्टर भाडे कॅल्क्युलेटर आता नवीन दरासह अपडेट झाले आहे.
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="grid-card" onclick="openSection('market-sec')"><i class="fa-solid fa-chart-line"></i><label>बाजार भाव</label></div>
+            <div class="grid-card" onclick="openSection('qr-sec')"><i class="fa-solid fa-qrcode"></i><label>QR स्कॅनर</label></div>
+            <div class="grid-card" onclick="openSection('weather-sec')"><i class="fa-solid fa-cloud-sun-rain"></i><label>हवामान</label></div>
+            <div class="grid-card" onclick="openSection('diary-sec')"><i class="fa-solid fa-book"></i><label>नफा-तोटा</label></div>
+            <div class="grid-card" onclick="openSection('satbara-sec')"><i class="fa-solid fa-file-contract"></i><label>७/१२ उतारा</label></div>
+            <div class="grid-card" onclick="openSection('tractor-sec')"><i class="fa-solid fa-tractor"></i><label>ट्रॅक्टर भाडे</label></div>
+            <div class="grid-card" onclick="openSection('loan-sec')"><i class="fa-solid fa-building-columns"></i><label>बँक हिशोब</label></div>
+            <div class="grid-card" onclick="openSection('scheme-sec')"><i class="fa-solid fa-gift"></i><label>योजना</label></div>
+            <div class="grid-card" onclick="openSection('locker-sec')"><i class="fa-solid fa-vault"></i><label>डॉक्युमेंट लॉकर</label></div>
+        </div>
+    </div>
+
+    <div id="market-sec" class="section-box">
+        <h3 class="sec-title">📈 लाईव्ह बाजार भाव</h3>
+        <div class="market-header-special">
+            परभणी आणि इतर मार्केटचे <b>सोयाबीन, कापूस, हरभरा आणि हळद</b> दर खाली प्राधान्याने दिसतील.
+        </div>
+        <select id="district-picker" class="modern-input">
+                <option value="Parbhani">परभणी (कपाशी/सोयाबीन)</option>
+                <option value="Latur">लातूर (सोयाबीन/तूर)</option>
+                <option value="Pune">पुणे (गुलटेकडी/भाजीपाला)</option>
+                <option value="Nagpur">नागपूर (संत्रा/कपाशी)</option>
+                <option value="Nashik">नाशिक (कांदा/द्राक्ष)</option>
+                <option value="Sangli">सांगली (हळद मार्केट)</option>
+                <option value="Kolhapur">कोल्हापूर (गुळ/ऊस)</option>
+                <option value="Amravati">अमरावती (कडधान्य)</option>
+                <option value="Jalgaon">जळगाव (केळी/कापूस)</option>
+            </select>
+        <button class="modern-btn" onclick="loadLiveMarket()">लाईव्ह दर पहा</button>
+
+        <div id="market-load" style="display:none; text-align:center; padding:20px;">🔄 डेटा लोड होत आहे...</div>
+        <div id="market-table-box" style="margin-top:20px;"></div>
+        
+        <div id="chart-panel" style="display:none; margin-top:25px;">
+            <canvas id="mktChart"></canvas>
+        </div>
+
+        <button id="btnWA" class="modern-btn" style="background: var(--wa-color); display:none; margin-top:20px;" onclick="shareToWA()">
+            <i class="fa-brands fa-whatsapp"></i> व्हॉट्सॲपवर शेअर करा
+        </button>
+    </div>
+
+    <div id="diary-sec" class="section-box">
+        <h3 class="sec-title">📔 शेतकरी डायरी</h3>
+        <input type="text" id="itemName" class="modern-input" placeholder="खर्च/उत्पन्न नाव (उदा. युरिया)">
+        <input type="number" id="itemPrice" class="modern-input" placeholder="रक्कम ₹">
+        <select id="itemType" class="modern-input">
+            <option value="expense">🔴 खर्च (Expense)</option>
+            <option value="income">🟢 उत्पन्न (Income)</option>
+        </select>
+        <button class="modern-btn" onclick="saveToLedger()">जतन करा</button>
+        
+        <div style="margin-top: 30px; padding: 20px; border-radius: 20px; background: #f9f9f9; text-align:center;">
+            <span style="font-size: 14px; color: #888;">एकूण शिल्लक (Balance)</span>
+            <h1 id="netBalance" style="margin: 5px 0; color: var(--primary-green);">₹ 0</h1>
+        </div>
+        <div id="ledger-history" style="margin-top:20px;"></div>
+    </div>
+
+    <div id="weather-sec" class="section-box">
+        <h3 class="sec-title">🌤️ हवामान अंदाज</h3>
+        <input type="text" id="cityInput" class="modern-input" placeholder="तुमच्या शहराचे नाव (इंग्रजीत)">
+        <button class="modern-btn" style="background:#42a5f5;" onclick="getAgriWeather()">अंदाज तपासा</button>
+        
+        <div id="w-card" style="display:none; margin-top:25px; background: linear-gradient(to bottom right, #1e3c72, #2a5298); color:white; border-radius:25px; padding:30px; text-align:center;">
+            <h2 id="w-city" style="margin:0;"></h2>
+            <h1 id="w-temp" style="font-size:60px; margin:10px 0;"></h1>
+            <p id="w-desc" style="text-transform: capitalize; font-size:18px;"></p>
+        </div>
+    </div>
+
+    <div id="tractor-sec" class="section-box">
+        <h3 class="sec-title">🚜 मशिनरी हिशोब</h3>
+        <label>क्षेत्र (एकर):</label>
+        <input type="number" id="tr-area" class="modern-input" value="1">
+        <label>भाडे दर प्रति एकर (₹):</label>
+        <input type="number" id="tr-rate" class="modern-input" value="1200">
+        <label>एकूण डिझेल खर्च (₹):</label>
+        <input type="number" id="tr-fuel" class="modern-input" value="400">
+        <button class="modern-btn" style="background: var(--tractor-gold);" onclick="solveTractor()">निव्वळ नफा काढा</button>
+        <div id="tr-res" style="display:none; margin-top:20px;" class="hero-banner"></div>
+    </div>
+
+    <div id="loan-sec" class="section-box">
+        <h3 class="sec-title">🏦 कर्ज (EMI) कॅल्क्युलेटर</h3>
+        <input type="number" id="ln-amt" class="modern-input" placeholder="कर्ज रक्कम (₹)">
+        <input type="number" id="ln-int" class="modern-input" placeholder="व्याज दर % (वार्षिक)">
+        <input type="number" id="ln-dur" class="modern-input" placeholder="कालावधी (महिने)">
+        <button class="modern-btn" style="background: var(--bank-blue);" onclick="solveEMI()">EMI काढा</button>
+        <div id="ln-res" style="display:none; margin-top:20px; text-align:center; padding:20px; border-radius:15px; background:#e3f2fd;"></div>
+    </div>
+
+    <div id="qr-sec" class="section-box">
+        <h3 class="sec-title">🔍 ७/१२ QR स्कॅनर</h3>
+        <div id="qr-cam" style="width:100%; border-radius:20px; overflow:hidden; border:2px solid var(--primary-green);"></div>
+        <div id="qr-output" style="display:none; margin-top:15px; font-weight:bold; color:var(--bank-blue);"></div>
+        <button class="modern-btn" style="margin-top:20px; background:#333;" onclick="openAgriScanner()"><i class="fa-solid fa-camera"></i> कॅमेरा सुरू करा</button>
+    </div>
+
+    <div id="satbara-sec" class="section-box">
+        <h3 class="sec-title">📄 ७/१२ उतारा</h3>
+        <p>डिजिटल ७/१२ उतारा पाहण्यासाठी तुम्ही 'महाभुलेख' च्या अधिकृत संकेतस्थळाला भेट देऊ शकता.</p>
+        <a href="https://bhulekh.mahabhumi.gov.in/" target="_blank" class="modern-btn" style="text-decoration:none; display:block; text-align:center;">🌐 पोर्टल उघडा</a>
+    </div>
+
+    <div id="scheme-sec" class="section-box">
+        <h3 class="sec-title">🎁 सरकारी योजना</h3>
+        <div class="hero-banner"><b>१. नमो शेतकरी महासन्मान:</b> ६००० वार्षिक लाभ.</div>
+        <div class="hero-banner" style="background:#e3f2fd; border-color:#2196f3;"><b>२. मागेल त्याला सौरपंप:</b> सिंचन सुविधेसाठी ९०% अनुदान.</div>
+    </div>
+    <div id="locker-sec" class="section-box" style="display:none;">
+    <h3 class="sec-title">📁 डॉक्युमेंट लॉकर</h3>
+    <div style="background:#f0f4f1; padding:15px; border-radius:15px; margin-bottom:20px;">
+        <input type="text" id="docName" class="modern-input" placeholder="कागदपत्राचे नाव">
+        <input type="file" id="docFile" class="modern-input" accept="image/*, application/pdf" style="margin-top:10px;">
+        <button class="modern-btn" onclick="saveDocument()" style="margin-top:15px;">जतन करा</button>
+    </div>
+    <div id="document-list"></div>
+</div>
+
+</main>
+
+<nav class="bottom-nav-bar">
+    <a href="#" class="nav-icon-link active" onclick="goHome(); return false;"><i class="fa-solid fa-house"></i>होम</a>
+    <a href="#" class="nav-icon-link" onclick="openSection('market-sec'); return false;"><i class="fa-solid fa-chart-column"></i>बाजार</a>
+    <a href="#" class="nav-icon-link" onclick="openSection('diary-sec'); return false;"><i class="fa-solid fa-pen-to-square"></i>डायरी</a>
+    <a href="#" class="nav-icon-link" onclick="toggleMenu(); return false;"><i class="fa-solid fa-user-gear"></i>सेटिंग्स</a>
+</nav>
+
+<script>
+    /* ==========================================
+       JAVASCRIPT CORE LOGIC
+       ==========================================
+    */
+    
+    const API_URL = "https://mahashetiapp-api.onrender.com";
+    const WEATHER_KEY = "895284adae258f1984abac8d7212002f";
+    
+    let activeChart = null;
+    let mainLedgerBalance = 0;
+    let savedMarketData = [];
+
+    // --- Welcome Logic ---
+    function showWelcome() {
+        document.getElementById('welcomeBox').style.display = 'block';
+        document.getElementById('mainOverlay').style.display = 'block';
+        setTimeout(function() {
+        closeWelcome();
+    }, 3000); 
+}
+    function closeWelcome() {
+        document.getElementById('welcomeBox').style.display = 'none';
+        document.getElementById('mainOverlay').style.display = 'none';
+    }
+
+    // Navigation Logic
+    function toggleMenu() {
+        const menu = document.getElementById('sideNav');
+        const overlay = document.getElementById('mainOverlay');
+        menu.classList.toggle('open');
+        overlay.style.display = menu.classList.contains('open') ? 'block' : 'none';
+    }
+
+    function goHome() {
+        document.getElementById('home-dashboard').style.display = 'block';
+        document.querySelectorAll('.section-box').forEach(s => s.style.display = 'none');
+        document.getElementById('back-btn').style.display = 'none'; // Back Button लपवा
+        updateNavIcons('home');
+    }
+
+    function openSection(id) {
+        document.getElementById('home-dashboard').style.display = 'none';
+        document.querySelectorAll('.section-box').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('back-btn').style.display = 'block'; // Back Button दाखवा
+        window.scrollTo(0,0);
+        updateNavIcons(id);
+    }
+
+    function updateNavIcons(id) {
+        document.querySelectorAll('.nav-icon-link').forEach(l => l.classList.remove('active'));
+        if(id === 'home') document.querySelectorAll('.nav-icon-link')[0].classList.add('active');
+        if(id === 'market-sec') document.querySelectorAll('.nav-icon-link')[1].classList.add('active');
+        if(id === 'diary-sec') document.querySelectorAll('.nav-icon-link')[2].classList.add('active');
+    }
+
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+
+    // MARKET LOGIC (PARBHANI SPECIAL ENGINE)
+    async function loadLiveMarket() {
+        const dist = document.getElementById('district-picker').value;
+        const loader = document.getElementById('market-load');
+        const display = document.getElementById('market-table-box');
+        
+        loader.style.display = 'block';
+        display.innerHTML = "";
+
+        try {
+            const response = await fetch(`${API_URL}/api/live-rates?district=${dist}`);
+            savedMarketData = await response.json();
+            
+            if(savedMarketData.length === 0) {
+                display.innerHTML = "<p style='text-align:center;'>आजचा डेटा उपलब्ध नाही.</p>";
+            } else {
+                let tableHtml = `<table class="report-table"><tr><th>बाजार समिती</th><th>पीक</th><th>सरासरी दर</th></tr>`;
+                const parbhaniFocus = savedMarketData.filter(item => {
+                    const c = item.commodity.toLowerCase();
+                    return c.includes('soyabean') || c.includes('cotton') || c.includes('gram') || c.includes('turmeric') || c.includes('halad') || c.includes('kapas');
+                });
+                const others = savedMarketData.filter(item => !parbhaniFocus.includes(item));
+                parbhaniFocus.forEach(i => {
+                    tableHtml += `<tr class="crop-row-highlight"><td><b>${i.market}</b></td><td>⭐ ${i.commodity}</td><td><b>₹${i.modal_price}</b></td></tr>`;
+                });
+                others.forEach(i => {
+                    tableHtml += `<tr><td>${i.market}</td><td>${i.commodity}</td><td>₹${i.modal_price}</td></tr>`;
+                });
+                display.innerHTML = tableHtml + `</table>`;
+                document.getElementById('chart-panel').style.display = 'block';
+                document.getElementById('btnWA').style.display = 'block';
+                renderMarketChart(savedMarketData.slice(0, 5));
+            }
+        } catch (e) {
+            display.innerHTML = "<p style='color:red;'>एरर! इंटरनेट कनेक्शन तपासा.</p>";
+        } finally {
+            loader.style.display = 'none';
+        }
+    }
+
+    function renderMarketChart(data) {
+        const ctx = document.getElementById('mktChart').getContext('2d');
+        if(activeChart) activeChart.destroy();
+        activeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.market),
+                datasets: [{ label: 'बाजार भाव', data: data.map(d => d.modal_price), backgroundColor: '#4caf50', borderRadius: 10 }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+    }
+
+    function shareToWA() {
+        let text = `🌱 *महाशेती बाजार भाव अपडेट - परभणी* \n\n`;
+        savedMarketData.slice(0, 5).forEach(i => {
+            text += `📍 ${i.market}: *₹${i.modal_price}* (${i.commodity})\n`;
+        });
+        text += `\nॲप डाऊनलोड करा: [GitHub Link Here]`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    }
+
+    // DIARY LOGIC
+    function saveToLedger() {
+        const name = document.getElementById('itemName').value;
+        const val = parseFloat(document.getElementById('itemPrice').value);
+        const type = document.getElementById('itemType').value;
+        if(!name || isNaN(val)) return alert("माहिती अचूक भरा!");
+        mainLedgerBalance += (type === 'income' ? val : -val);
+        document.getElementById('netBalance').innerText = `₹ ${mainLedgerBalance}`;
+        document.getElementById('netBalance').style.color = mainLedgerBalance >= 0 ? '#1b5e20' : '#d32f2f';
+        const history = document.getElementById('ledger-history');
+        const entry = document.createElement('div');
+        entry.style.display = "flex"; entry.style.justifyContent = "space-between"; entry.style.padding = "15px 0"; entry.style.borderBottom = "1px solid #eee";
+        entry.innerHTML = `<span>${name}</span><b style="color:${type==='income'?'green':'red'}">${type==='income'?'+':'-'} ₹${val}</b>`;
+        history.prepend(entry);
+        document.getElementById('itemName').value = ""; document.getElementById('itemPrice').value = "";
+    }
+
+    // WEATHER ENGINE
+    async function getAgriWeather() {
+        const city = document.getElementById('cityInput').value;
+        if(!city) return alert("शहराचे नाव टाका!");
+        try {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_KEY}&units=metric&lang=mr`);
+            const data = await res.json();
+            const card = document.getElementById('w-card');
+            card.style.display = 'block';
+            document.getElementById('w-city').innerText = data.name;
+            document.getElementById('w-temp').innerText = Math.round(data.main.temp) + "°C";
+            document.getElementById('w-desc').innerText = data.weather[0].description;
+        } catch (e) { alert("शहर सापडले नाही!"); }
+    }
+
+    // TRACTOR LOGIC
+    function solveTractor() {
+        const area = document.getElementById('tr-area').value;
+        const rate = document.getElementById('tr-rate').value;
+        const fuel = document.getElementById('tr-fuel').value;
+        const totalProfit = (area * rate) - fuel;
+        const box = document.getElementById('tr-res');
+        box.style.display = 'block';
+        box.innerHTML = `एकूण उत्पन्न: <b>₹${area * rate}</b> <br> निव्वळ नफा: <b style="color:green; font-size:20px;">₹${totalProfit}</b>`;
+    }
+
+    // EMI LOGIC
+    function solveEMI() {
+        const p = document.getElementById('ln-amt').value;
+        const r = (document.getElementById('ln-int').value / 12) / 100;
+        const n = document.getElementById('ln-dur').value;
+        const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        const box = document.getElementById('ln-res');
+        box.style.display = 'block';
+        box.innerHTML = `महिन्याचा हप्ता: <h2 style="color:var(--bank-blue); margin:5px;">₹ ${Math.round(emi)}</h2> एकूण परतफेड: ₹${Math.round(emi * n)}`;
+    }
+
+    // SCANNER LOGIC
+    function openAgriScanner() {
+        let scanner = new Html5Qrcode("qr-cam");
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+            const out = document.getElementById('qr-output');
+            out.style.display = 'block';
+            out.innerHTML = `स्कॅन यशस्वी! <a href="${decodedText}" target="_blank">येथे क्लिक करा</a>`;
+            scanner.stop();
+        }).catch(err => alert("कॅमेरा एरर!"));
+    }
+// १. डॉक्युमेंट सेव्ह करणे
+function saveDocument() {
+    const name = document.getElementById('docName').value;
+    const fileInput = document.getElementById('docFile');
+    if (!name || fileInput.files.length === 0) return alert("माहिती भरा!");
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const doc = { id: Date.now(), name: name, content: e.target.result };
+        let docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+        docs.push(doc);
+        localStorage.setItem('myDocs', JSON.stringify(docs));
+        displayDocuments();
+        alert("कागदपत्र सेव्ह झाले!");
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+}
+
+// २. सेव्ह केलेली कागदपत्रे दाखवणे
+function displayDocuments() {
+    const list = document.getElementById('document-list');
+    const docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+    list.innerHTML = docs.length === 0 ? '<p style="text-align:center;">लॉकर रिकामे आहे.</p>' : '';
+    docs.forEach(doc => {
+        list.innerHTML += `
+            <div style="background:white; padding:15px; border-radius:12px; display:flex; justify-content:space-between; margin-bottom:10px; border:1px solid #eee;">
+                <span><b>${doc.name}</b></span>
+                <div>
+                    <i class="fa-solid fa-eye" style="color:green; cursor:pointer; margin-right:15px;" onclick="viewDoc('${doc.id}')"></i>
+                    <i class="fa-solid fa-trash" style="color:red; cursor:pointer;" onclick="deleteDoc('${doc.id}')"></i>
+                </div>
+            </div>`;
+    });
+}
+
+// ३. फाईल पाहणे आणि डिलीट करणे
+function viewDoc(id) {
+    const docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+    const doc = docs.find(d => d.id == id);
+    const win = window.open();
+    win.document.write(`<iframe src="${doc.content}" frameborder="0" style="width:100%; height:100%;"></iframe>`);
+}
+
+function deleteDoc(id) {
+    if(confirm("डिलीट करायचे का?")) {
+        let docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+        docs = docs.filter(d => d.id != id);
+        localStorage.setItem('myDocs', JSON.stringify(docs));
+        displayDocuments();
+    }
+}
+
+// पेज लोड होताच फाईल्स दिसण्यासाठी ही ओळ आधीच्या window.onload मध्ये टाका किंवा अशीच ठेवा
+window.addEventListener('load', displayDocuments);
+</script>
+</body>
+</html>

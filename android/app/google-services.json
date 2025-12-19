@@ -1,0 +1,34 @@
+{
+  "project_info": {
+    "project_number": "121491029804",
+    "project_id": "mahashetiapp",
+    "storage_bucket": "mahashetiapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121491029804:android:f909e92703bc141482f689",
+        "android_client_info": {
+          "package_name": "com.mahasheti.app"
+        }
+      },
+      "oauth_client": [
+  {
+    "client_id": "121491029804-3tbq9ie6pgc8irtlnonqoiplih3pqhlu.apps.googleusercontent.com",
+    "client_type": 3
+  }
+],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMifLKboJX4HCDOf3RQdH7IxfAZM_rRJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

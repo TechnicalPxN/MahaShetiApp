@@ -1,0 +1,27 @@
+{
+  "appId": "com.mahasheti.app",
+  "appName": "MahaSheti BSN",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": ["*"]
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["phone"]
+    },
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "backgroundColor": "#ffffff"
+    },
+    "Camera": {
+      "copyToClipboard": true
+    }
+  }
+}

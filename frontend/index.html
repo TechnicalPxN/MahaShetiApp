@@ -1,243 +1,283 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MahaSheti App Dashboard</title>
+<script>
+    /* ==========================================
+       JAVASCRIPT CORE LOGIC
+       ==========================================
+    */
     
-<style>
-    /* 1. Global Reset and Base Styles */
-    body { 
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        margin: 0; 
-        padding: 0;
-        background-color: #f0f8f0; /* Very light green background */
-        color: #333;
-        line-height: 1.6;
-    }
-    .container { 
-        width: 95%;
-        max-width: 1200px; 
-        margin: 20px auto; 
-        background: white; 
-        padding: 30px; 
-        border-radius: 12px; 
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1); 
-    }
-    h1 { 
-        color: #1e8449; /* Darker green */
-        border-bottom: 4px solid #2ecc71; /* Accent line */
-        padding-bottom: 15px; 
-        margin-bottom: 30px;
-        font-size: 2em;
-    }
+    const API_URL = "https://mahashetiapp-api.onrender.com";
+    const WEATHER_KEY = "895284adae258f1984abac8d7212002f";
     
-    /* 2. Controls - Responsive Flex Layout */
-    .controls {
-        margin-bottom: 30px;
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
-        justify-content: flex-start;
-    }
-    .controls button { 
-        padding: 12px 20px; 
-        background-color: #3498db; /* Blue for primary actions */
-        color: white; 
-        border: none; 
-        border-radius: 8px; 
-        cursor: pointer; 
-        font-size: 1em;
-        font-weight: bold;
-        transition: background-color 0.3s, transform 0.2s; 
-        flex-grow: 1; /* Allows buttons to expand */
-        min-width: 150px; /* Minimum width for readability */
-    }
-    .controls button:hover { 
-        background-color: #2980b9; 
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    
-    /* 3. Table Styling - Responsive */
-    #data-display { 
-        margin-top: 25px; 
-        overflow-x: auto; /* Ensures horizontal scrolling for tables on mobile */
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 5px; /* Padding for the scroll area */
-    }
-    table { 
-        width: 100%; 
-        min-width: 600px; /* Ensures table columns don't collapse too much */
-        border-collapse: collapse; 
-    }
-    th, td { 
-        border: 1px solid #e0e0e0; 
-        padding: 15px 12px; 
-        text-align: left; 
-        font-size: 0.95em;
-    }
-    th { 
-        background-color: #2ecc71; 
-        color: white; 
-        text-transform: uppercase;
-        font-weight: 600;
-        position: sticky; /* Keeps header visible during vertical scroll */
-        top: 0;
-    }
-    tr:nth-child(even) {
-        background-color: #f5fcf5; /* Lightest green for striping */
-    }
-    
-    /* 4. Utility Classes */
-    .loading, .error {
-        text-align: center;
-        padding: 30px;
-        border-radius: 5px;
-        font-size: 1.1em;
-    }
-    .loading { color: #3498db; }
-    .error { 
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+    let activeChart = null;
+    let mainLedgerBalance = 0;
+    let savedMarketData = [];
+
+    // --- Welcome Logic ---
+    function showWelcome() {
+        document.getElementById('welcomeBox').style.display = 'block';
+        document.getElementById('mainOverlay').style.display = 'block';
+        setTimeout(function() {
+        closeWelcome();
+    }, 3000); 
+}
+    function closeWelcome() {
+        document.getElementById('welcomeBox').style.display = 'none';
+        document.getElementById('mainOverlay').style.display = 'none';
     }
 
-    /* 5. Media Queries for Mobile Responsiveness */
-    @media (max-width: 768px) {
-        .container {
-            padding: 20px;
-            margin: 10px auto;
-        }
-        h1 {
-            font-size: 1.7em;
-            text-align: center;
-        }
-        .controls {
-            flex-direction: column; /* Stack buttons vertically */
-            gap: 10px;
-        }
-        .controls button {
-            width: 100%; /* Full width for better tapping */
-            min-width: auto;
-        }
-        th, td {
-            padding: 10px 8px; /* Reduce padding on small screens */
-            font-size: 0.9em;
-        }
-        table {
-            min-width: 500px; /* Keep minimum width to force scrolling */
-        }
+    // Navigation Logic
+    function toggleMenu() {
+        const menu = document.getElementById('sideNav');
+        const overlay = document.getElementById('mainOverlay');
+        menu.classList.toggle('open');
+        overlay.style.display = menu.classList.contains('open') ? 'block' : 'none';
     }
 
-    @media (max-width: 480px) {
-        body { padding: 5px; }
-        .container { padding: 15px; }
-        h1 { font-size: 1.5em; }
+    function goHome() {
+        document.getElementById('home-dashboard').style.display = 'block';
+        document.querySelectorAll('.section-box').forEach(s => s.style.display = 'none');
+        document.getElementById('back-btn').style.display = 'none'; // Back Button लपवा
+        updateNavIcons('home');
     }
-</style>
-</head>
-<body>
-    <div class="container">
-        <h1>🌱 महाशेती ॲप</h1>
+
+    function openSection(id) {
+        document.getElementById('home-dashboard').style.display = 'none';
+        document.querySelectorAll('.section-box').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('back-btn').style.display = 'block'; // Back Button दाखवा
+        window.scrollTo(0,0);
+        updateNavIcons(id);
+    }
+
+    function updateNavIcons(id) {
+        document.querySelectorAll('.nav-icon-link').forEach(l => l.classList.remove('active'));
+        if(id === 'home') document.querySelectorAll('.nav-icon-link')[0].classList.add('active');
+        if(id === 'market-sec') document.querySelectorAll('.nav-icon-link')[1].classList.add('active');
+        if(id === 'diary-sec') document.querySelectorAll('.nav-icon-link')[2].classList.add('active');
+    }
+
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+
+    // MARKET LOGIC (PARBHANI SPECIAL ENGINE)
+    async function loadLiveMarket() {
+        const dist = document.getElementById('district-picker').value;
+        const loader = document.getElementById('market-load');
+        const display = document.getElementById('market-table-box');
         
+        loader.style.display = 'block';
+        display.innerHTML = "";
 
-        <div class="controls">
-            <button onclick="fetchData('crops')">पिकांची माहिती (Crops)</button>
-            <button onclick="fetchData('rates')">बाजार दर (Rates)</button>
-            <button onclick="fetchData('schemes')">शासकीय योजना (Schemes)</button>
-        </div>
-
-        <div id="data-display">
-            वरील बटण दाबून डेटा लोड करा.
-        </div>
-    </div>
-
-    <script>
-        const API_BASE_URL = "https://mahashetiapp-api.onrender.com";
-        const dataDisplay = document.getElementById('data-display');
-
-        /**
-         * मिळालेल्या JSON डेटाचे HTML टेबलमध्ये रूपांतरण करते.
-         * @param {Array} data - API कडून मिळालेला डेटा 
-         * @param {string} title - टेबलचे शीर्षक 
-         */
-        function renderTable(data, title) {
-            if (!data || data.length === 0) {
-                return `<p><strong>${title}:</strong> डेटाबेसमध्ये कोणतीही माहिती उपलब्ध नाही.</p>`;
-            }
-
-            // टेबल हेडर (Headers)
-            const headers = Object.keys(data[0]);
+        try {
+            const response = await fetch(`${API_URL}/api/live-rates?district=${dist}`);
+            savedMarketData = await response.json();
             
-            let html = `<h2>${title} (${data.length} नोंदी)</h2>`;
-            html += '<table><thead><tr>';
-            
-            headers.forEach(header => {
-                html += `<th>${header}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-
-            // टेबल बॉडी (Rows)
-            data.forEach(item => {
-                html += '<tr>';
-                headers.forEach(header => {
-                    const value = item[header] === null || item[header] === undefined ? '' : item[header];
-                    html += `<td>${value}</td>`;
+            if(savedMarketData.length === 0) {
+                display.innerHTML = "<p style='text-align:center;'>आजचा डेटा उपलब्ध नाही.</p>";
+            } else {
+                let tableHtml = `<table class="report-table"><tr><th>बाजार समिती</th><th>पीक</th><th>सरासरी दर</th></tr>`;
+                const parbhaniFocus = savedMarketData.filter(item => {
+                    const c = item.commodity.toLowerCase();
+                    return c.includes('soyabean') || c.includes('cotton') || c.includes('gram') || c.includes('turmeric') || c.includes('halad') || c.includes('kapas');
                 });
-                html += '</tr>';
-            });
-
-            html += '</tbody></table>';
-            return html;
-        }
-
-        /**
-         * निवडलेल्या API एंडपॉइंटवरून डेटा फेच करते.
-         * @param {string} endpoint - API चा शेवटचा भाग (उदा. 'crops', 'rates')
-         */
-        async function fetchData(endpoint) {
-            dataDisplay.innerHTML = '<div class="loading">माहिती लोड करत आहे...</div>';
-            const url = `${API_BASE_URL}/api/${endpoint}`;
-            let title = '';
-
-            switch(endpoint) {
-                case 'crops': title = 'पिकांची माहिती'; break;
-                case 'rates': title = 'बाजार दर'; break;
-                case 'schemes': title = 'शासकीय योजना'; break;
-                default: title = 'डेटा';
+                const others = savedMarketData.filter(item => !parbhaniFocus.includes(item));
+                parbhaniFocus.forEach(i => {
+                    tableHtml += `<tr class="crop-row-highlight"><td><b>${i.market}</b></td><td>⭐ ${i.commodity}</td><td><b>₹${i.modal_price}</b></td></tr>`;
+                });
+                others.forEach(i => {
+                    tableHtml += `<tr><td>${i.market}</td><td>${i.commodity}</td><td>₹${i.modal_price}</td></tr>`;
+                });
+                display.innerHTML = tableHtml + `</table>`;
+                document.getElementById('chart-panel').style.display = 'block';
+                document.getElementById('btnWA').style.display = 'block';
+                renderMarketChart(savedMarketData.slice(0, 5));
             }
-
-            try {
-                const response = await fetch(url);
-                
-                // HTTP 4xx किंवा 5xx त्रुटींसाठी
-                if (!response.ok) {
-                    const errorDetails = await response.json().catch(() => ({}));
-                    const errorMessage = errorDetails.message || `API कडून त्रुटी मिळाली: ${response.status}`;
-                    throw new Error(errorMessage);
-                }
-                
-                const data = await response.json();
-                
-                // डेटा मिळाल्यावर तो टेबलमध्ये प्रदर्शित करा
-                dataDisplay.innerHTML = renderTable(data, title);
-
-            } catch (error) {
-                dataDisplay.innerHTML = `<div class="error">
-                    <p><strong>डेटा फेच करताना त्रुटी:</strong> ${error.message}</p>
-                    <p>सूचना: कृपया बॅकएंड जागे होण्याची (Wake up) प्रतीक्षा करा. <br> 
-                    <a href="${API_BASE_URL}/api/crops" target="_blank" style="color: #721c24; font-weight: bold;">येथे क्लिक करून स्टेटस तपासा</a></p>
-                </div>`;
-                console.error('Fetch Error:', error);
-            }
+        } catch (e) {
+            display.innerHTML = "<p style='color:red;'>एरर! इंटरनेट कनेक्शन तपासा.</p>";
+        } finally {
+            loader.style.display = 'none';
         }
-        
-        // पेज लोड झाल्यावर डिफॉल्ट 'crops' डेटा लोड करा
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchData('crops');
+    }
+
+    function renderMarketChart(data) {
+        const ctx = document.getElementById('mktChart').getContext('2d');
+        if(activeChart) activeChart.destroy();
+        activeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.market),
+                datasets: [{ label: 'बाजार भाव', data: data.map(d => d.modal_price), backgroundColor: '#4caf50', borderRadius: 10 }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
         });
+    }
+
+    function shareToWA() {
+        let text = `🌱 *महाशेती बाजार भाव अपडेट - परभणी* \n\n`;
+        savedMarketData.slice(0, 5).forEach(i => {
+            text += `📍 ${i.market}: *₹${i.modal_price}* (${i.commodity})\n`;
+        });
+        text += `\nॲप डाऊनलोड करा: [GitHub Link Here]`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    }
+
+    // DIARY LOGIC
+    function saveToLedger() {
+        const name = document.getElementById('itemName').value;
+        const val = parseFloat(document.getElementById('itemPrice').value);
+        const type = document.getElementById('itemType').value;
+        if(!name || isNaN(val)) return alert("माहिती अचूक भरा!");
+        mainLedgerBalance += (type === 'income' ? val : -val);
+        document.getElementById('netBalance').innerText = `₹ ${mainLedgerBalance}`;
+        document.getElementById('netBalance').style.color = mainLedgerBalance >= 0 ? '#1b5e20' : '#d32f2f';
+        const history = document.getElementById('ledger-history');
+        const entry = document.createElement('div');
+        entry.style.display = "flex"; entry.style.justifyContent = "space-between"; entry.style.padding = "15px 0"; entry.style.borderBottom = "1px solid #eee";
+        entry.innerHTML = `<span>${name}</span><b style="color:${type==='income'?'green':'red'}">${type==='income'?'+':'-'} ₹${val}</b>`;
+        history.prepend(entry);
+        document.getElementById('itemName').value = ""; document.getElementById('itemPrice').value = "";
+    }
+
+    // WEATHER ENGINE
+    async function getAgriWeather() {
+        const city = document.getElementById('cityInput').value;
+        if(!city) return alert("शहराचे नाव टाका!");
+        try {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_KEY}&units=metric&lang=mr`);
+            const data = await res.json();
+            const card = document.getElementById('w-card');
+            card.style.display = 'block';
+            document.getElementById('w-city').innerText = data.name;
+            document.getElementById('w-temp').innerText = Math.round(data.main.temp) + "°C";
+            document.getElementById('w-desc').innerText = data.weather[0].description;
+        } catch (e) { alert("शहर सापडले नाही!"); }
+    }
+
+    // TRACTOR LOGIC
+    function solveTractor() {
+        const area = document.getElementById('tr-area').value;
+        const rate = document.getElementById('tr-rate').value;
+        const fuel = document.getElementById('tr-fuel').value;
+        const totalProfit = (area * rate) - fuel;
+        const box = document.getElementById('tr-res');
+        box.style.display = 'block';
+        box.innerHTML = `एकूण उत्पन्न: <b>₹${area * rate}</b> <br> निव्वळ नफा: <b style="color:green; font-size:20px;">₹${totalProfit}</b>`;
+    }
+
+    // EMI LOGIC
+    function solveEMI() {
+        const p = document.getElementById('ln-amt').value;
+        const r = (document.getElementById('ln-int').value / 12) / 100;
+        const n = document.getElementById('ln-dur').value;
+        const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        const box = document.getElementById('ln-res');
+        box.style.display = 'block';
+        box.innerHTML = `महिन्याचा हप्ता: <h2 style="color:var(--bank-blue); margin:5px;">₹ ${Math.round(emi)}</h2> एकूण परतफेड: ₹${Math.round(emi * n)}`;
+    }
+
+    // SCANNER LOGIC
+    function openAgriScanner() {
+        let scanner = new Html5Qrcode("qr-cam");
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+            const out = document.getElementById('qr-output');
+            out.style.display = 'block';
+            out.innerHTML = `स्कॅन यशस्वी! <a href="${decodedText}" target="_blank">येथे क्लिक करा</a>`;
+            scanner.stop();
+        }).catch(err => alert("कॅमेरा एरर!"));
+    }
+// १. डॉक्युमेंट सेव्ह करणे
+function saveDocument() {
+    const name = document.getElementById('docName').value;
+    const fileInput = document.getElementById('docFile');
+    if (!name || fileInput.files.length === 0) return alert("माहिती भरा!");
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const doc = { id: Date.now(), name: name, content: e.target.result };
+        let docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+        docs.push(doc);
+        localStorage.setItem('myDocs', JSON.stringify(docs));
+        displayDocuments();
+        alert("कागदपत्र सेव्ह झाले!");
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+}
+
+// २. सेव्ह केलेली कागदपत्रे दाखवणे
+function displayDocuments() {
+    const list = document.getElementById('document-list');
+    const docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+    list.innerHTML = docs.length === 0 ? '<p style="text-align:center;">लॉकर रिकामे आहे.</p>' : '';
+    docs.forEach(doc => {
+        list.innerHTML += `
+            <div style="background:white; padding:15px; border-radius:12px; display:flex; justify-content:space-between; margin-bottom:10px; border:1px solid #eee;">
+                <span><b>${doc.name}</b></span>
+                <div>
+                    <i class="fa-solid fa-eye" style="color:green; cursor:pointer; margin-right:15px;" onclick="viewDoc('${doc.id}')"></i>
+                    <i class="fa-solid fa-trash" style="color:red; cursor:pointer;" onclick="deleteDoc('${doc.id}')"></i>
+                </div>
+            </div>`;
+    });
+}
+
+// ३. फाईल पाहणे आणि डिलीट करणे
+function viewDoc(id) {
+    const docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+    const doc = docs.find(d => d.id == id);
+    const win = window.open();
+    win.document.write(`<iframe src="${doc.content}" frameborder="0" style="width:100%; height:100%;"></iframe>`);
+}
+
+function deleteDoc(id) {
+    if(confirm("डिलीट करायचे का?")) {
+        let docs = JSON.parse(localStorage.getItem('myDocs') || '[]');
+        docs = docs.filter(d => d.id != id);
+        localStorage.setItem('myDocs', JSON.stringify(docs));
+        displayDocuments();
+    }
+}
+
+
+// पेज लोड होताच फाईल्स दिसण्यासाठी ही ओळ आधीच्या window.onload मध्ये टाका किंवा अशीच ठेवा
+window.addEventListener('load', displayDocuments);
+</script>
+<script>
+      document.addEventListener('deviceready', () => {
+        const PushNotifications = Capacitor.Plugins.PushNotifications;
+
+        const setupPush = async () => {
+          try {
+            let permStatus = await PushNotifications.checkPermissions();
+
+            if (permStatus.receive === 'prompt') {
+              permStatus = await PushNotifications.requestPermissions();
+            }
+
+            if (permStatus.receive === 'granted') {
+              await PushNotifications.register();
+              console.log("MahaSheti Push: Registered!");
+            }
+          } catch (error) {
+            console.error("Push Error: ", error);
+          }
+        };
+
+        setupPush();
+      }, false);
+
     </script>
-</body>
-</html>
+    <script>
+  // हा कोड Capacitor ला सांगतो की बॅक बटण दाबल्यावर काय करायचे
+  document.addEventListener('DOMContentLoaded', () => {
+    const { App } = Capacitor.Plugins;
+    
+    if (App) {
+      App.addListener('backButton', (data) => {
+        // जर युजर होम पेजवर नसेल तर मागे न्या, अन्यथा ॲप बंद करा
+        if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+          App.exitApp();
+        } else {
+          window.history.back();
+        }
+      });
+    }
+  });
+</script>
