@@ -7,11 +7,9 @@ const admin = require('firebase-admin');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // १. Firebase Admin SDK Setup
-// तुमची JSON फाईल याच फोल्डरमध्ये 'firebase-key.json' नावाने ठेवा
 const serviceAccount = require("./firebase-key.json");
-
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount)
 });
 
 const PORT = process.env.PORT || 3000; 
@@ -25,21 +23,14 @@ const client = new Client({
 app.use(cors());
 app.use(express.json());
 
-// २. नवीन नोटिफिकेशन API (Admin साठी)
+// २. नोटिफिकेशन API
 app.post('/api/send-notification', async (req, res) => {
     const { title, body } = req.body;
-
     const message = {
         notification: { title: title, body: body },
         topic: 'all_farmers',
-        android: {
-            notification: {
-                priority: 'high',
-                sound: 'default'
-            }
-        }
+        android: { notification: { priority: 'high', sound: 'default' } }
     };
-
     try {
         const response = await admin.messaging().send(message);
         res.status(200).json({ success: true, messageId: response });
@@ -48,21 +39,26 @@ app.post('/api/send-notification', async (req, res) => {
     }
 });
 
-// ३. जुने बाजार भाव API
+// ३. सुधारित बाजार भाव API (Error Fix)
 app.get('/api/live-rates', async (req, res) => {
+    // ही API Key आणि URL परभणी/महाराष्ट्र डेटासाठी ऑप्टिमाइझ केली आहे
     const apiKey = '579b464db66ec23bdd0000016cb8fa246b134e146c91f1583ffdf900';
-    const district = req.query.district || 'Nagpur'; 
-    const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Maharashtra&sort[arrival_date]=desc&limit=200`;
+    const district = req.query.district || 'Parbhani'; 
+    
+    // आम्ही फिल्टर थेट URL मध्ये लावला आहे जेणेकरून अचूक डेटा मिळेल
+    const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Maharashtra&filters[district]=${district}`;
 
     try {
+        console.log(`बाजार भाव शोधत आहे: ${district}`);
         const response = await fetch(url);
         const data = await response.json();
         
-        const filteredData = data.records.filter(item => 
-            item.district.toLowerCase() === district.toLowerCase()
-        );
+        if (!data.records || data.records.length === 0) {
+            // जर डेटा नसेल तर एरर देण्याऐवजी रिकामा लिस्ट पाठवा
+            return res.json([]); 
+        }
 
-        const simplifiedData = filteredData.map(item => ({
+        const simplifiedData = data.records.map(item => ({
             market: item.market,
             commodity: item.commodity,
             modal_price: item.modal_price,
@@ -71,7 +67,8 @@ app.get('/api/live-rates', async (req, res) => {
 
         res.json(simplifiedData);
     } catch (err) {
-        res.status(500).json({ error: "डेटा एरर" });
+        console.error("Fetch Error:", err);
+        res.status(500).json({ error: "API सर्व्हर प्रतिसाद देत नाही" });
     }
 });
 
@@ -89,6 +86,9 @@ app.get('/api/schemes', async (req, res) => {
         res.json(result.rows);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
+// ५. सर्व्हर सुरू करा
+app.get('/', (req, res) => res.send('MahaSheti Backend is Live! ✅'));
 
 client.connect()
     .then(() => {

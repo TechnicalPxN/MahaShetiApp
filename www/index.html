@@ -842,60 +842,87 @@
 </script>
 
 <script>
+    // १. अ‍ॅडमिन नोटिफिकेशन पाठवण्याचे फंक्शन
     async function sendAutomaticNotification() {
-            const title = document.getElementById('notif-title').value;
-            const body = document.getElementById('notif-body').value;
-            
-            if(!title || !body) return alert("माहिती भरा!");
+        const title = document.getElementById('notif-title').value;
+        const body = document.getElementById('notif-body').value;
+        
+        if(!title || !body) return alert("माहिती भरा!");
 
+        try {
+            const response = await fetch('https://mahashetiapp-api.onrender.com/api/send-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, body })
+            });
+            const res = await response.json();
+            if(res.success) alert("यशस्वीरित्या पाठवले! ✅");
+        } catch (e) { alert("सर्व्हर एरर! इंटरनेट तपासा."); }
+    }
+
+    // २. सुधारीत नॅव्हिगेशन लॉजिक (Admin Section दिसण्यासाठी)
+    function goHome() {
+        document.getElementById('home-dashboard').style.display = 'block';
+        document.getElementById('admin-sec').style.display = 'block'; // होमवर अ‍ॅडमिन दिसेल
+        document.querySelectorAll('.section-box').forEach(s => {
+            if(s.id !== 'admin-sec') s.style.display = 'none';
+        });
+        document.getElementById('back-btn').style.display = 'none'; 
+        updateNavIcons('home');
+    }
+
+    function openSection(id) {
+        document.getElementById('home-dashboard').style.display = 'none';
+        document.getElementById('admin-sec').style.display = 'none'; // दुसऱ्या सेक्शनमध्ये अ‍ॅडमिन लपवा
+        document.querySelectorAll('.section-box').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('back-btn').style.display = 'block'; 
+        window.scrollTo(0,0);
+        updateNavIcons(id);
+    }
+
+    // ३. पुश नोटिफिकेशन परमिशन आणि बॅक बटन
+    document.addEventListener('deviceready', async () => {
+        const { App, PushNotifications } = Capacitor.Plugins;
+
+        // अ‍ॅप उघडताच परमिशन मागणे
+        const setupPush = async () => {
             try {
-                // तुमच्या खऱ्या Render URL ने ही लिंक बदला
-                const response = await fetch('https://mahashetiapp-api.onrender.com/api/send-notification', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, body })
-                });
-                const res = await response.json();
-                if(res.success) alert("यशस्वीरित्या पाठवले! ✅");
-            } catch (e) { alert("सर्व्हर एरर! इंटरनेट तपासा."); }
-        }
+                let permStatus = await PushNotifications.checkPermissions();
+                if (permStatus.receive === 'prompt') {
+                    permStatus = await PushNotifications.requestPermissions();
+                }
+                if (permStatus.receive === 'granted') {
+                    await PushNotifications.register();
+                }
+            } catch (error) {
+                console.error("Push Error: ", error);
+            }
+        };
 
-    // १. पॉपअप दाखवणे आणि बंद करणे
-    function showExitPopup() {
-        document.getElementById('exitPopup').style.display = 'block';
-    }
+        setupPush(); // परमिशन विचारण्यासाठी कॉल
 
-    function closeExitPopup() {
-        document.getElementById('exitPopup').style.display = 'none';
-    }
-
-    function exitNow() {
-        Capacitor.Plugins.App.exitApp();
-    }
-
-    // २. बॅक बटन लॉजिक
-    document.addEventListener('deviceready', () => {
-        const { App } = Capacitor.Plugins;
-
+        // बॅक बटन लॉजिक
         App.addListener('backButton', () => {
             const homeDashboard = document.getElementById('home-dashboard');
             const menu = document.getElementById('sideNav');
 
-            // जर साईड मेनू उघडा असेल तर तो बंद करा
             if (menu && menu.classList.contains('open')) {
                 toggleMenu();
                 return;
             }
 
-            // जर आपण एखाद्या सेक्शनमध्ये असू, तर होमवर जा
             if (homeDashboard && homeDashboard.style.display === 'none') {
                 goHome();
             } else {
-                // जर आधीच होम डॅशबोर्डवर असू, तर एक्झिट पॉपअप दाखवा
                 showExitPopup();
             }
         });
     });
+
+    function showExitPopup() { document.getElementById('exitPopup').style.display = 'block'; }
+    function closeExitPopup() { document.getElementById('exitPopup').style.display = 'none'; }
+    function exitNow() { Capacitor.Plugins.App.exitApp(); }
 </script>
 </body>
 </html>
